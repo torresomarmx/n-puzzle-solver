@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 
@@ -18,13 +19,13 @@ public class MinPriorityQueue<Key> {
     }
 
     public Key deleteMin() {
-       if (numberOfElements == 0) throw new NoSuchElementException();
+       if (this.numberOfElements == 0) throw new NoSuchElementException();
        Key min = this.heap[1];
        this.heap[1] = this.heap[this.numberOfElements];
        this.heap[this.numberOfElements] = null;
-       this.sink(1);
        this.numberOfElements -= 1;
-       if (this.numberOfElements == (this.heap.length - 1) / 4)
+       this.sink(1);
+       if (this.numberOfElements > 0 && (this.numberOfElements == (this.heap.length - 1) / 4))
            this.resize((this.heap.length - 1) / 2);
        return min;
     }
@@ -43,7 +44,7 @@ public class MinPriorityQueue<Key> {
 
     private void resize(int newSize) {
         Key[] newHeap = (Key[]) new Object[newSize];
-        for (int i = 0; i < this.heap.length; i++)
+        for (int i = 1; i < this.numberOfElements + 1; i++)
             newHeap[i] = this.heap[i];
         this.heap = newHeap;
     }
@@ -79,5 +80,30 @@ public class MinPriorityQueue<Key> {
         return this.comparator.compare(element, elementToCompareTo) > 0;
     }
 
-    public static void main(String[] args) {}
+    public String toString() {
+        return Arrays.toString(this.heap);
+    }
+    public static void main(String[] args) {
+        MinPriorityQueue<Integer> mpq = new MinPriorityQueue();
+        mpq.insert(8);
+        mpq.insert(10);
+        mpq.insert(20);
+        mpq.insert(1);
+        mpq.insert(2);
+        mpq.insert(40);
+        System.out.println(mpq);
+
+        System.out.println(mpq.deleteMin());
+        System.out.println(mpq);
+        System.out.println(mpq.deleteMin());
+        System.out.println(mpq);
+        while (mpq.numberOfElements() > 0) {
+            System.out.println(mpq.deleteMin());
+            System.out.println(mpq);
+        }
+        mpq.insert(3);
+        System.out.println(mpq);
+        System.out.println(mpq.deleteMin());
+        System.out.println(mpq);
+    }
 }
