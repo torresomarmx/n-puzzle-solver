@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Board {
 
@@ -91,7 +92,37 @@ public class Board {
     }
 
     // // all neighboring boards
-    // public Iterable<Board> neighbors() {}
+    public Iterable<Board> neighbors() {
+        return new NeighborsIterable(this);
+    }
+
+    private class NeighborsIterable implements Iterable<Board> {
+
+        private Board boardWithNeighbors;
+
+        public NeighborsIterable(Board board) {
+            this.boardWithNeighbors = board;
+        }
+        public Iterator<Board> iterator() {
+            return new NeighborsIterator();
+        }
+
+        private class NeighborsIterator implements Iterator<Board> {
+           private Board currentBoardWithNeighbors = NeighborsIterable.this.boardWithNeighbors;
+
+           public boolean hasNext() {
+
+           }
+
+           public Board next() {
+
+           }
+
+           public void remove() {
+               throw new UnsupportedOperationException();
+           }
+        }
+    }
 
     // // is this board solvable?
     // public boolean isSolvable() {}
