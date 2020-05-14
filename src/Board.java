@@ -7,12 +7,17 @@ public class Board {
     private int hammingDistance = 0;
 
     private int manhattanDistance = 0;
+
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] tiles) {
+        if (tiles.length == 0)
+            throw new IllegalArgumentException("tile cannot be empty");
         this.board = tiles;
-       int currentOrderedTile = 1;
-       for (int i = 0; i < this.board.length; i++) {
+        int currentOrderedTile = 1;
+        for (int i = 0; i < this.board.length; i++) {
+           if (this.board[i].length != this.board.length)
+               throw new IllegalArgumentException("tiles must be an n *n grid");
            for (int j = 0; j < this.board.length; j++) {
             if (this.board[i][j] != 0 && this.board[i][j] != currentOrderedTile) {
                 this.hammingDistance += 1;
@@ -22,7 +27,7 @@ public class Board {
             }
             currentOrderedTile += 1;
            }
-       }
+        }
     }
 
     // string representation of this board
@@ -58,10 +63,32 @@ public class Board {
     }
 
     // is this board the goal board?
-    // public boolean isGoal() {}
+    public boolean isGoal() {
+        int currentOrderTile = 1;
+        for (int i = 0; i < this.board.length; i++) {
+            for (int j = 0; j < this.board.length; j ++) {
+                if (currentOrderTile != this.board[i][j]) return false;
+            }
+        }
+        return true;
+    }
 
     // // does this board equal y?
-    // public boolean equals(Object y) {}
+    public boolean equals(Object y) {
+       if (this == y)
+           return true;
+       if (y == null || getClass() != y.getClass())
+           return false;
+       Board yBoard = (Board) y;
+       if (yBoard.size() != this.size()) return false;
+       for (int i = 0; i < this.size(); i++) {
+           for (int j = 0; j < this.size(); i++) {
+               if (this.tileAt(i, j) != yBoard.tileAt(i,j))
+                   return false;
+           }
+       }
+       return true;
+    }
 
     // // all neighboring boards
     // public Iterable<Board> neighbors() {}
