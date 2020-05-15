@@ -9,6 +9,8 @@ public class Board {
 
     private int manhattanDistance = 0;
 
+    private int[] blankSquarePosition;
+
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] tiles) {
@@ -20,15 +22,22 @@ public class Board {
            if (this.board[i].length != this.board.length)
                throw new IllegalArgumentException("tiles must be an n *n grid");
            for (int j = 0; j < this.board.length; j++) {
-            if (this.board[i][j] != 0 && this.board[i][j] != currentOrderedTile) {
-                this.hammingDistance += 1;
-                int[] coordinatesForMisplacedTile = this.getCoordinates(this.board[i][j]);
-                this.manhattanDistance += (Math.abs(coordinatesForMisplacedTile[0] - i) +
-                                            Math.abs(coordinatesForMisplacedTile[1] - j));
-            }
+               if (this.board[i][j] == 0) {
+                   int[] foundBlankSquarePosition = new int[2];
+                   foundBlankSquarePosition[0] = i;
+                   foundBlankSquarePosition[1] = j;
+                   this.blankSquarePosition = foundBlankSquarePosition;
+               } else if (this.board[i][j] != currentOrderedTile) {
+                   this.hammingDistance += 1;
+                   int[] coordinatesForMisplacedTile = this.getCoordinates(this.board[i][j]);
+                   this.manhattanDistance += (Math.abs(coordinatesForMisplacedTile[0] - i) +
+                           Math.abs(coordinatesForMisplacedTile[1] - j));
+               }
             currentOrderedTile += 1;
            }
         }
+        if (this.blankSquarePosition == null)
+            throw new IllegalArgumentException("No blank square found");
     }
 
     // string representation of this board
@@ -93,15 +102,23 @@ public class Board {
 
     // // all neighboring boards
     public Iterable<Board> neighbors() {
-        return new NeighborsIterable(this);
+        return new NeighborsIterable();
     }
 
     private class NeighborsIterable implements Iterable<Board> {
 
-        private Board boardWithNeighbors;
+        private int[][] neighborCoordinates;
 
-        public NeighborsIterable(Board board) {
-            this.boardWithNeighbors = board;
+        private int numberOfNeighbors;
+
+        public NeighborsIterable() {
+            // check left of blank square
+
+            // check right of blank square
+
+            // check top of blank square
+
+            // check bottom of blank square
         }
         public Iterator<Board> iterator() {
             return new NeighborsIterator();
