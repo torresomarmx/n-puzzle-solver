@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class Board {
 
@@ -15,7 +16,7 @@ public class Board {
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] tiles) {
         if (tiles.length == 0)
-            throw new IllegalArgumentException("tile cannot be empty");
+            throw new IllegalArgumentException("tiles cannot be empty");
         this.board = tiles;
         int currentOrderedTile = 1;
         for (int i = 0; i < this.board.length; i++) {
@@ -23,10 +24,7 @@ public class Board {
                throw new IllegalArgumentException("tiles must be an n *n grid");
            for (int j = 0; j < this.board.length; j++) {
                if (this.board[i][j] == 0) {
-                   int[] foundBlankSquarePosition = new int[2];
-                   foundBlankSquarePosition[0] = i;
-                   foundBlankSquarePosition[1] = j;
-                   this.blankSquarePosition = foundBlankSquarePosition;
+                   this.blankSquarePosition = new int[]{i, j};
                } else if (this.board[i][j] != currentOrderedTile) {
                    this.hammingDistance += 1;
                    int[] coordinatesForMisplacedTile = this.getCoordinates(this.board[i][j]);
@@ -42,10 +40,10 @@ public class Board {
 
     // string representation of this board
     public String toString() {
-        String[] boardString = new String[this.board.length];
-        for (int i = 0; i < this.board.length; i++) {
-            String[] currentRow = new String[this.board.length];
-            for (int j = 0; j < this.board.length; j++)
+        String[] boardString = new String[this.size()];
+        for (int i = 0; i < this.size(); i++) {
+            String[] currentRow = new String[this.size()];
+            for (int j = 0; j < this.size(); j++)
                currentRow[j] = this.board[i][j] + " ";
             boardString[i] = String.join(" ", currentRow);
         }
@@ -75,8 +73,8 @@ public class Board {
     // is this board the goal board?
     public boolean isGoal() {
         int currentOrderTile = 1;
-        for (int i = 0; i < this.board.length; i++) {
-            for (int j = 0; j < this.board.length; j ++) {
+        for (int i = 0; i < this.size(); i++) {
+            for (int j = 0; j < this.size(); j ++) {
                 if (currentOrderTile != this.board[i][j]) return false;
             }
         }
@@ -107,32 +105,76 @@ public class Board {
 
     private class NeighborsIterable implements Iterable<Board> {
 
-        private int[][] neighborCoordinates;
+        private int[][] neighborCoordinates = new int[4][];
 
-        private int numberOfNeighbors;
+        private int numberOfNeighbors = 0;
 
         public NeighborsIterable() {
+            int currentNeighborIndex = 0;
             // check left of blank square
+            if (Board.this.blankSquarePosition[1] > 0) {
+                neighborCoordinates[currentNeighborIndex] = new int[]{
+                        Board.this.blankSquarePosition[0],
+                        Board.this.blankSquarePosition[1] - 1
+                };
+                currentNeighborIndex += 1;
+            }
 
             // check right of blank square
+            if (Board.this.blankSquarePosition[1] < Board.this.size() - 1) {
+               neighborCoordinates[currentNeighborIndex] = new int[]{
+                       Board.this.blankSquarePosition[0],
+                       Board.this.blankSquarePosition[1] + 1
+               };
+               currentNeighborIndex += 1;
+            }
 
             // check top of blank square
+            if (Board.this.blankSquarePosition[0] > 0) {
+                neighborCoordinates[currentNeighborIndex] = new int[]{
+                        Board.this.blankSquarePosition[0] - 1,
+                        Board.this.blankSquarePosition[1]
+                };
+                currentNeighborIndex += 1;
+            }
 
             // check bottom of blank square
+            if (Board.this.blankSquarePosition[0] < Board.this.size() - 1) {
+                neighborCoordinates[currentNeighborIndex] = new int[]{
+                        Board.this.blankSquarePosition[0] + 1,
+                        Board.this.blankSquarePosition[1]
+                };
+                currentNeighborIndex += 1;
+            }
+            this.numberOfNeighbors = currentNeighborIndex;
         }
         public Iterator<Board> iterator() {
             return new NeighborsIterator();
         }
 
         private class NeighborsIterator implements Iterator<Board> {
-           private Board currentBoardWithNeighbors = NeighborsIterable.this.boardWithNeighbors;
 
+           int currentNeighborIndex = 0;
            public boolean hasNext() {
-
+               return this.currentNeighborIndex < NeighborsIterable.this.numberOfNeighbors;
            }
 
            public Board next() {
-
+                if (!this.hasNext())
+                    throw new NoSuchElementException();
+                int[][] neighborTiles = new int[Board.this.size()][];
+                for (int i = 0; i < Board.this.size(); i++) {
+                    int[] row = new int[Board.this.size()];
+                    for (int j = 0; j < Board.this.size(); j++)
+                        row[j] = Board.this.board[i][j];
+                    neighborTiles[i] = row;
+                }
+                int[] currentNeighborCoordinates = NeighborsIterable.this.neighborCoordinates[this.currentNeighborIndex];
+                neighborTiles[Board.this.blankSquarePosition[0]][Board.this.blankSquarePosition[1]] =
+                        neighborTiles[currentNeighborCoordinates[0]][currentNeighborCoordinates[1]];
+                neighborTiles[currentNeighborCoordinates[0]][currentNeighborCoordinates[1]] = 0;
+                this.currentNeighborIndex += 1;
+                return new Board(neighborTiles);
            }
 
            public void remove() {
@@ -145,9 +187,9 @@ public class Board {
     // public boolean isSolvable() {}
 
     public int[] getCoordinates(int tileNumber) {
-        int row = (tileNumber / this.board.length) - 1;
-        int col = tileNumber % this.board.length;
-        if (col == 0) col = this.board.length - 1;
+        int row = (tileNumber / this.size()) - 1;
+        int col = tileNumber % this.size();
+        if (col == 0) col = this.size() - 1;
         else {
             row += 1;
             col = -1 + col;
@@ -155,18 +197,21 @@ public class Board {
         return new int[]{row, col};
     }
 
-
     // unit testing (required)
     public static void main(String[] args) {
         int[][] testTiles = new int[3][3];
-        testTiles[0] = new int[]{8,1,3};
-        testTiles[1] = new int[]{4,0,2};
+        testTiles[0] = new int[]{0,1,3};
+        testTiles[1] = new int[]{4,8,2};
         testTiles[2] = new int[]{7,6,5};
         Board testBoard = new Board(testTiles);
         System.out.println(testBoard);
         System.out.println(Arrays.toString(testBoard.getCoordinates(13)));
         System.out.println(testBoard.hamming());
         System.out.println(testBoard.manhattan());
+        for (Board neighbor : testBoard.neighbors()) {
+            System.out.println(neighbor);
+            System.out.println("____");
+        }
     }
 
 }
