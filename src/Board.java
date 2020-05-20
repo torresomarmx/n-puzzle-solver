@@ -187,6 +187,7 @@ public class Board {
     // public boolean isSolvable() {}
 
     public int[] getCoordinates(int tileNumber) {
+        //TODO check that tileNumber is not out of bounds
         int row = (tileNumber / this.size()) - 1;
         int col = tileNumber % this.size();
         if (col == 0) col = this.size() - 1;
