@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -184,7 +185,43 @@ public class Board {
     }
 
     // // is this board solvable?
-    // public boolean isSolvable() {}
+    //public boolean isSolvable() {
+    //    if (this.board.length % 2 == 0) {
+    //        // even sized board
+    //    }
+    //}
+
+    private static long countNumberOfInversions(int[] auxiliaryArray, int[] listOfNumbers, int lowIdx, int highIdx) {
+        if (highIdx <= lowIdx) return 0;
+        int midIdx = lowIdx + ((highIdx - lowIdx) / 2);
+        long numberOfLeftInversions = Board.countNumberOfInversions(auxiliaryArray, listOfNumbers, lowIdx, midIdx);
+        long numberOfRightInversions = Board.countNumberOfInversions(auxiliaryArray, listOfNumbers, midIdx + 1, highIdx);
+        for (int i = lowIdx; i <= highIdx; i++)
+            auxiliaryArray[i] = listOfNumbers[i];
+
+        long numberOfSplitInversions = 0;
+        int leftPointerIdx = lowIdx;
+        int rightPointerIdx = midIdx + 1;
+        for (int i = lowIdx; i <= highIdx; i++) {
+           if (leftPointerIdx > midIdx) {
+               listOfNumbers[i] = auxiliaryArray[rightPointerIdx];
+               rightPointerIdx += 1;
+           } else if (rightPointerIdx > highIdx) {
+               listOfNumbers[i] = auxiliaryArray[leftPointerIdx];
+               leftPointerIdx += 1;
+           } else if (auxiliaryArray[leftPointerIdx] > auxiliaryArray[rightPointerIdx]) {
+               listOfNumbers[i] = auxiliaryArray[rightPointerIdx];
+               rightPointerIdx += 1;
+               numberOfSplitInversions += (midIdx - leftPointerIdx + 1);
+           } else {
+               listOfNumbers[i] = auxiliaryArray[leftPointerIdx];
+               leftPointerIdx += 1;
+           }
+        }
+
+        System.out.println(numberOfLeftInversions + numberOfRightInversions + numberOfSplitInversions);
+        return numberOfLeftInversions + numberOfRightInversions + numberOfSplitInversions;
+    }
 
     public int[] getCoordinates(int tileNumber) {
         //TODO check that tileNumber is not out of bounds
@@ -198,8 +235,21 @@ public class Board {
         return new int[]{row, col};
     }
 
-    // unit testing (required)
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+//        BufferedReader fileReader = new BufferedReader(new FileReader(args[0]));
+//        String lineRead = fileReader.readLine();
+//        int[] testNums = new int[100000];
+//        int currentIdx = 0;
+//        while (lineRead != null) {
+//           testNums[currentIdx] = Integer.parseInt(lineRead);
+//           currentIdx += 1;
+//           lineRead = fileReader.readLine();
+//        }
+//        int[] aux = new int[100000];
+//        System.out.println(Board.countNumberOfInversions(aux, testNums, 0, testNums.length -1));
+//        int[] aux = new int[6];
+//        int[] testNums = new int[]{6,5,4,3,2,1};
+//        System.out.println(Board.countNumberOfInversions(aux, testNums, 0, testNums.length - 1));
         int[][] testTiles = new int[3][3];
         testTiles[0] = new int[]{0,1,3};
         testTiles[1] = new int[]{4,8,2};
