@@ -73,11 +73,20 @@ public class Board {
 
     // is this board the goal board?
     public boolean isGoal() {
-        int currentOrderTile = 1;
+        int currentOrderedTile = 1;
+        int[][] goalTiles = new int[this.size()][];
         for (int i = 0; i < this.size(); i++) {
+            int[] subArray = new int[this.size()];
             for (int j = 0; j < this.size(); j ++) {
-                if (currentOrderTile != this.board[i][j]) return false;
+                subArray[j] = currentOrderedTile;
+                currentOrderedTile += 1;
             }
+            goalTiles[i] = subArray;
+        }
+        goalTiles[this.size()-1][this.size()-1] = 0;
+        for (int i = 0; i < this.size(); i++) {
+            for (int j = 0; j < this.size(); j++)
+                if (this.board[i][j] != goalTiles[i][j]) return false;
         }
         return true;
     }
@@ -91,7 +100,7 @@ public class Board {
        Board yBoard = (Board) y;
        if (yBoard.size() != this.size()) return false;
        for (int i = 0; i < this.size(); i++) {
-           for (int j = 0; j < this.size(); i++) {
+           for (int j = 0; j < this.size(); j++) {
                if (this.tileAt(i, j) != yBoard.tileAt(i,j))
                    return false;
            }
@@ -185,11 +194,22 @@ public class Board {
     }
 
     // // is this board solvable?
-    //public boolean isSolvable() {
-    //    if (this.board.length % 2 == 0) {
-    //        // even sized board
-    //    }
-    //}
+    public boolean isSolvable() {
+        int[] boardInRowMajor = new int[this.size() * this.size() - 1];
+        int currentIdx = 0;
+        for (int i = 0; i < this.size(); i++) {
+            for (int j = 0; j < this.size(); j++)
+                if (this.board[i][j] != 0) boardInRowMajor[currentIdx++] = this.board[i][j];
+        }
+        int[] aux = new int[boardInRowMajor.length];
+        long numberOfInversions = Board.countNumberOfInversions(aux, boardInRowMajor, 0, boardInRowMajor.length -1);
+        if (this.board.length % 2 == 0) {
+            // even sized board
+            return (numberOfInversions + this.blankSquarePosition[0]) % 2 != 0;
+        }
+        // odd size board
+        return numberOfInversions % 2 == 0;
+    }
 
     private static long countNumberOfInversions(int[] auxiliaryArray, int[] listOfNumbers, int lowIdx, int highIdx) {
         if (highIdx <= lowIdx) return 0;
@@ -219,7 +239,6 @@ public class Board {
            }
         }
 
-        System.out.println(numberOfLeftInversions + numberOfRightInversions + numberOfSplitInversions);
         return numberOfLeftInversions + numberOfRightInversions + numberOfSplitInversions;
     }
 
@@ -250,19 +269,26 @@ public class Board {
 //        int[] aux = new int[6];
 //        int[] testNums = new int[]{6,5,4,3,2,1};
 //        System.out.println(Board.countNumberOfInversions(aux, testNums, 0, testNums.length - 1));
-        int[][] testTiles = new int[3][3];
-        testTiles[0] = new int[]{0,1,3};
-        testTiles[1] = new int[]{4,8,2};
-        testTiles[2] = new int[]{7,6,5};
+        int[][] testTiles = new int[4][];
+        testTiles[0] = new int[]{1,2,3,4};
+//        testTiles[1] = new int[]{5,6,0,8};
+//        testTiles[2] = new int[]{9,10,7,11};
+//        testTiles[3] = new int[]{13,14,15,12};
+
+        testTiles[1] = new int[]{5,6,7,8};
+        testTiles[2] = new int[]{9,10,11,12};
+        testTiles[3] = new int[]{13,14,15,0};
         Board testBoard = new Board(testTiles);
-        System.out.println(testBoard);
-        System.out.println(Arrays.toString(testBoard.getCoordinates(13)));
-        System.out.println(testBoard.hamming());
-        System.out.println(testBoard.manhattan());
-        for (Board neighbor : testBoard.neighbors()) {
-            System.out.println(neighbor);
-            System.out.println("____");
-        }
+        System.out.println(testBoard.isSolvable());
+        System.out.println(testBoard.isGoal());
+        // System.out.println(testBoard);
+        // System.out.println(Arrays.toString(testBoard.getCoordinates(13)));
+        // System.out.println(testBoard.hamming());
+        // System.out.println(testBoard.manhattan());
+        // for (Board neighbor : testBoard.neighbors()) {
+        //     System.out.println(neighbor);
+        //     System.out.println("____");
+        // }
     }
 
 }

@@ -41,7 +41,6 @@ public class MinPriorityQueue<Key> {
        return this.numberOfElements;
     }
 
-
     private void resize(int newSize) {
         Key[] newHeap = (Key[]) new Object[newSize];
         for (int i = 1; i < this.numberOfElements + 1; i++)
