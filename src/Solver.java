@@ -1,3 +1,8 @@
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.util.Arrays;
+import java.util.Scanner;
+
 public class Solver {
 
     private class SearchNode implements Comparable<SearchNode> {
@@ -9,6 +14,7 @@ public class Solver {
 
         public SearchNode(Board board, SearchNode previousNode, int numberOfMoves) {
             this.board = board;
+            this.previousNode = previousNode;
             this.numberOfMoves = numberOfMoves;
         }
 
@@ -45,7 +51,13 @@ public class Solver {
         }
         if (goalNode == null)
             throw new IllegalArgumentException("An error occurred");
-        System.out.println(goalNode.getBoard());
+        System.out.println(String.format("Minimum number of moves: %s", goalNode.getNumberOfMoves()));
+        SearchNode currentSearchNodeBackTrace = goalNode;
+        while (currentSearchNodeBackTrace != null) {
+            System.out.println(currentSearchNodeBackTrace.getBoard());
+            System.out.println();
+            currentSearchNodeBackTrace = currentSearchNodeBackTrace.getPreviousNode();
+        }
     }
 
     // min number of moves to solve initial board
@@ -55,12 +67,30 @@ public class Solver {
 //    public Iterable<Board> solution()
 //
 //    // test client (see below)
-    public static void main(String[] args) {
-        int[][] testTiles = new int[4][];
-        testTiles[0] = new int[]{1,2,3,4};
-        testTiles[1] = new int[]{5,6,0,8};
-        testTiles[2] = new int[]{9,10,7,11};
-        testTiles[3] = new int[]{13,14,15,12};
+    public static void main(String[] args) throws Exception {
+        Scanner fileScanner = new Scanner(new BufferedInputStream(new FileInputStream(args[0])));
+        int n = fileScanner.nextInt();
+        int[][] testTiles = new int[n][];
+        int[] currentRow = new int[n];
+        int currentRowIdx = 0;
+        int currentColIdx = 0;
+        while (currentRowIdx < n) {
+           if (currentColIdx == n) {
+               testTiles[currentRowIdx] = currentRow;
+               currentColIdx = 0;
+               currentRow = new int[n];
+               currentRowIdx += 1;
+               continue;
+           }
+           currentRow[currentColIdx] = fileScanner.nextInt();
+           currentColIdx += 1;
+        }
+        //  System.out.println(n);
+        //  int[][] testTiles = new int[4][];
+        //  testTiles[0] = new int[]{1,2,3,4};
+        //  testTiles[1] = new int[]{5,6,0,8};
+        //  testTiles[2] = new int[]{9,10,7,11};
+        //  testTiles[3] = new int[]{13,14,15,12};
         Board testBoard = new Board(testTiles);
         Solver solver = new Solver(testBoard);
     }
