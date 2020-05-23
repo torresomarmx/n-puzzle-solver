@@ -82,6 +82,11 @@ public class MinPriorityQueue<Key> {
     public String toString() {
         return Arrays.toString(this.heap);
     }
+
+    public Key getMin() {
+        if (this.numberOfElements == 0) throw new NoSuchElementException();
+        return this.heap[1];
+    }
     public static void main(String[] args) {
         MinPriorityQueue<Integer> mpq = new MinPriorityQueue();
         mpq.insert(8);

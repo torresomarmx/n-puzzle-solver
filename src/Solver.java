@@ -97,7 +97,6 @@ public class Solver {
         }
     }
 
-//    // test client (see below)
     public static void main(String[] args) throws Exception {
         Scanner fileScanner = new Scanner(new BufferedInputStream(new FileInputStream(args[0])));
         int n = fileScanner.nextInt();

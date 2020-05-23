@@ -1,5 +1,3 @@
-import java.io.*;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -242,8 +240,7 @@ public class Board {
         return numberOfLeftInversions + numberOfRightInversions + numberOfSplitInversions;
     }
 
-    public int[] getCoordinates(int tileNumber) {
-        //TODO check that tileNumber is not out of bounds
+    private int[] getCoordinates(int tileNumber) {
         int row = (tileNumber / this.size()) - 1;
         int col = tileNumber % this.size();
         if (col == 0) col = this.size() - 1;
@@ -290,5 +287,4 @@ public class Board {
         //     System.out.println("____");
         // }
     }
-
 }
