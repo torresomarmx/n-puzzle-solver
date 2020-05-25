@@ -1,4 +1,4 @@
-This solver is capable of optimally solving any sized sliding puzzle. It does this by using the A\* 
+This solver is capable of optimally solving a sliding puzzle of any size. It does this by using the A\* 
 graph traversal algorithm
 
 Features:
